@@ -10,6 +10,8 @@ async function getGroupStudents() {
     result.forEach(student => {
         studentGroups.push(student);
     });
+
+
     let groups = [...new Set(studentGroups.map(item => item.group))];
     for (let i in groups) {
         filterByGroupName(result, groups[i]);
@@ -21,29 +23,26 @@ function filterByGroupName(students, groupName) {
     let groupOfStudents = {
         group: groupName,
     }
-    students.forEach(student => {
-        if (student.group === groupName) {
-            groupStudents.push(student.name);
-            groupOfStudents.students = groupStudents;
-            if (student.type === 'assistant') {
-                groupOfStudents.asistant = student.name;
-            }
-        }
-    });
+
+    students.filter(function (filterAsis) { filterAsis.type === "assistant" && filterAsis.group === groupName ? groupOfStudents.asistant = filterAsis.name : null })
+    students.filter(function (filterGroup) { filterGroup.group === groupName ? groupStudents.push(filterGroup.name) : null })
+    groupOfStudents.students = groupStudents;
+
     console.log(groupOfStudents);
-    showGroupsToUI(groupOfStudents.group, groupOfStudents.asistant, Object.values(groupOfStudents.students).join('<br/>'));
+    const studentsInGroup = Object.values(groupOfStudents.students).join('<br/>')
+    showGroupsToUI(groupOfStudents.group, groupOfStudents.asistant, studentsInGroup);
 }
 
 function showGroupsToUI(groupName, asistantName, studentName) {
     document.querySelector('#root').innerHTML += `
-        <div class="col-md-4 mt-3" >
-            <div class="card" style="height: 30rem;">
-                <div class="card-body">
-                    <h5 class="card-title" id="group-name"> ${groupName} </h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">${studentName}</li>
+        <div class="card" >
+            <div>
+                <div class="card-body" >
+                    <h2> ${groupName} </h2>
+                    <ul>
+                        <li>${studentName}</li>
                     </ul>
-                    <p class="mt-2"><strong>Asistant: </strong> <small> ${asistantName} </small></p>
+                    <p><strong>Asistant: </strong> <small> ${asistantName} </small></p>
                 </div>
             </div>
         </div>
